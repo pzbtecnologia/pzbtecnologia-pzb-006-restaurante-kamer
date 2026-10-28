@@ -28,3 +28,21 @@ filtros.forEach(botao => botao.addEventListener('click', () => {
   });
 }));
 document.getElementById('anoAtual').textContent = String(new Date().getFullYear());
+
+// Recuperação de imagens em caso de diferenças entre pastas ou extensões.
+document.querySelectorAll('img[src^="assets/"]').forEach(img => {
+  const original = img.getAttribute('src');
+  const filename = original.split('/').pop();
+  const base = filename.replace(/\.(jpg|jpeg|webp|png)$/i, '');
+  const extension = filename.split('.').pop().toLowerCase();
+  const extensions = [...new Set([extension, 'webp', 'jpg', 'jpeg', 'png'])];
+  const candidates = [
+    ...extensions.map(ext => `assets/${base}.${ext}`),
+    ...extensions.map(ext => `${base}.${ext}`)
+  ];
+  let index = 0;
+  img.addEventListener('error', () => {
+    index++;
+    if (index < candidates.length) img.src = candidates[index];
+  });
+});
